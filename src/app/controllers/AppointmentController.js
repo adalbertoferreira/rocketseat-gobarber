@@ -49,14 +49,25 @@ class AppointmentController {
     /**
      * Check if provider_id is a provider
      */
-    const isProvider = await User.findOne({
+    const checkIsProvider = await User.findOne({
       where: { id: provider_id, provider: true },
     });
 
-    if (!isProvider) {
+    if (!checkIsProvider) {
       return res
         .status(401)
         .json({ error: 'You can only create appointments with providers' });
+    }
+
+    /**
+     * Check if user is equal to the provider
+     */
+    const checkIsUserSameAsProvider = provider_id === req.userId;
+
+    if (checkIsUserSameAsProvider) {
+      return res
+        .status(401)
+        .json({ error: 'A provider cannot create an appointment for himself' });
     }
 
     /**
